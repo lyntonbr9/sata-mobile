@@ -1,0 +1,231 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Stock Options Analysis</title>
+		<script src="js/canvasjs.js"></script>
+		<script src="js/json2.js"></script>
+		<script>
+			var _DATA = {};
+			function testarJS() {
+				console.log('Vai testar o botao');
+				//console.log(window.JSInterface.resultado('Vamos ver funcionar'));
+				//var text1 = '[{"x":10,"y":30},{"x":20,"y":25},{"x":30,"y":20}]';
+				//var data1 = [{x: 10, y: 30 },{ x: 20, y: 25},{ x: 30, y: 20}];
+				//var obj1 = JSON.parse(text1);
+				_DATA = JSON.parse(window.JSInterface.resultado('Vamos ver funcionar'));
+				alert('Teste Botao1');
+				var text = '{ "employees" : [' +
+'{ "firstName":"John" , "lastName":"Doe" },' +
+'{ "firstName":"Anna" , "lastName":"Smith" },' +
+'{ "firstName":"Peter" , "lastName":"Jones" } ]}';
+				var objeto = JSON.parse(text);
+				//alert(JSON.stringify(objeto));
+				//alert(window.JSInterface);
+				//window.JSInterface.resultado('Vamos ver funcionar');
+			}
+			
+			function ocultarContainer() {
+				//document.getElementById('chartContainer').style.display = 'none';
+				var myNode = document.getElementById("chartContainer");
+				while (myNode.firstChild) {
+					myNode.removeChild(myNode.firstChild);
+				}
+				document.getElementById('voltar').style.display = 'none';
+				document.getElementById('camposPreenchimento').style.display = 'block';
+			}
+			function abrirContainer() {
+				//document.getElementById('chartContainer').style.display = 'block';
+				document.getElementById('voltar').style.display = 'block';
+				document.getElementById('camposPreenchimento').style.display = 'none';
+			}
+			
+			function getCotacao() {
+				var codigoAtivo = document.getElementById('codigoAtivo').value;
+				var cotacao = window.JSInterface.getCotacao(codigoAtivo);
+				document.getElementById('lblCotacaoAtivo').innerHTML = cotacao;
+			}
+			
+		</script>
+	</head>
+	<body>
+		<div id="camposPreenchimento" >
+			<table>
+				<tr>
+					<td>Pre&ccedil;o Exer. Op&ccedil;&atilde;o:</td>
+					<td><input id="pe" value="21.0" type="text" /></td>
+				</tr>
+				<tr>
+					<td>Pre&ccedil;o In&iacute;cio A&ccedil;&atilde;o:</td>
+					<td><input id="pia" value="19.0" type="text" /></td>
+				</tr>
+				<tr>
+					<td>Pre&ccedil;o Final A&ccedil;&atilde;o:</td>
+					<td><input id="pfa" value="25.0" type="text" /></td>
+				</tr>
+				<tr>
+					<td>Intervalo da A&ccedil;&atilde;o:</td>
+					<td><input id="interv" value="0.5" type="text" /></td>
+				</tr>
+				<tr>
+					<td>Volatilidade:</td>
+					<td><input id="volat" value="0.27" type="text" /></td>
+				</tr>
+				<tr>
+					<td>Taxa de Juros:</td>
+					<td><input id="txjuros" value="0.09" type="text" /></td>
+				</tr>
+				<tr>
+					<td><input type="radio" name="tipoOpcao" value="1" checked>Call</td>
+					<td><input type="radio" name="tipoOpcao" value="0">Put</td>
+				</tr>
+			</table>
+			<input value="Mostrar Grafico" type="button" onclick="mostrarGrafico();" />
+			<!--
+			<input value="Testar JS" type="button" onclick="testarJS();" />
+			-->
+		</div>
+		<input id="voltar" value="Voltar" type="button" onclick="ocultarContainer();" />
+		
+		<div id="campoAtivo" >
+			<table>
+				<tr>
+					<td>Ativo:</td>
+					<td><input id="codigoAtivo" value="PETR4" type="text" /></td>
+					<td><input value="Buscar" type="button" onclick="getCotacao();" /></td>
+				</tr>
+				<tr>
+					<td>Pre&ccedil;o:</td>
+					<td><label id="lblCotacaoAtivo"></label></td>
+					<td>&nbsp;</td>
+				</tr>
+			</table>
+		</div>
+		
+		<div id="chartContainer" style="margin-left: auto; margin-right: auto" />
+		
+		<!--
+		<div style="margin-left: auto; margin-right: auto">
+			<div>
+				<canvas id="canvas" style=""></canvas>
+			</div>
+		</div>
+		-->
+		
+	<script>
+		var randomScalingFactor = function(){ return Math.round(Math.random()*100)};
+		var lineChartData = {
+			labels : ["January","February","March","April","May","June","July"],
+			datasets : [
+				{
+					label: "My First dataset",
+					fillColor : "rgba(220,220,220,0.2)",
+					strokeColor : "rgba(220,220,220,1)",
+					pointColor : "rgba(220,220,220,1)",
+					pointStrokeColor : "#fff",
+					pointHighlightFill : "#fff",
+					pointHighlightStroke : "rgba(220,220,220,1)",
+					data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
+				},
+				{
+					label: "My Second dataset",
+					fillColor : "rgba(151,187,205,0.2)",
+					strokeColor : "rgba(151,187,205,1)",
+					pointColor : "rgba(151,187,205,1)",
+					pointStrokeColor : "#fff",
+					pointHighlightFill : "#fff",
+					pointHighlightStroke : "rgba(151,187,205,1)",
+					data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
+				}
+			]
+
+		}
+	
+	function getBS(qtdDias) {
+		var opcoes = document.getElementsByName('tipoOpcao');
+		var indice = 0;
+		for (var i = 0; i < opcoes.length; i++) {
+			if (opcoes[i].checked) {
+				indice = i;
+				break;
+			}
+		}
+		var ehCall = (opcoes[indice].value == "1") ? true : false;
+		var pe = parseFloat(document.getElementById("pe").value);
+		var pia = parseFloat(document.getElementById("pia").value);
+		var pfa = parseFloat(document.getElementById("pfa").value);
+		var interv = parseFloat(document.getElementById("interv").value);
+		var volat = parseFloat(document.getElementById("volat").value);
+		var txjuros = parseFloat(document.getElementById("txjuros").value);
+		//alert(pe);
+		//alert(pia);
+		//alert(pfa);
+		//alert(interv);
+		//alert(volat);
+		//alert(txjuros);
+		//var dados = JSON.parse(window.JSInterface.resultado(21.0, 20.0, 25.0, 0.5, qtdDias, 0.27, 0.09));
+		var dados = JSON.parse(window.JSInterface.resultado(ehCall, pe, pia, pfa, interv, qtdDias, volat, txjuros));
+		console.log(JSON.stringify(dados));
+		return dados;
+	}
+	 
+	window.onload = function() {
+		ocultarContainer();
+	}
+	mostrarGrafico = function(){
+		//var ctx = document.getElementById("canvas").getContext("2d");
+		//window.myLine = new Chart(ctx).Line(lineChartData, {
+		//	responsive: true
+		//});
+		//alert('entrou');
+		var chart = new CanvasJS.Chart("chartContainer",
+		{
+		  title:{
+			text: "Stock Options Analysis"  
+		  },
+		  data: [
+			  {        
+				type: "line",
+				showInLegend: true,
+				legendText: '30 dias',
+				dataPoints: getBS(30)
+			  },
+			  {        
+				type: "line",
+				showInLegend: true,
+				legendText: '25 dias',
+				dataPoints: getBS(25)
+			  },
+			  {        
+				type: "line",
+				showInLegend: true,
+				legendText: '20 dias',
+				dataPoints: getBS(20)
+			  },
+			  {        
+				type: "line",
+				showInLegend: true,
+				legendText: '15 dias',
+				dataPoints: getBS(15)
+			  },
+			  {        
+				type: "line",
+				showInLegend: true,
+				legendText: '10 dias',
+				dataPoints: getBS(10)
+			  },
+			  {        
+				type: "line",
+				showInLegend: true,
+				legendText: '3 dias',
+				dataPoints: getBS(3)
+			  }
+		  ]
+		});
+
+		chart.render();
+		
+		abrirContainer();
+	}
+	</script>
+	</body>
+</html>
